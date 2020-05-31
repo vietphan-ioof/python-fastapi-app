@@ -25,17 +25,13 @@ jobs:
     name: Build and deploy
     runs-on: ubuntu-latest
     steps:
-
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       - name: Docker Hub Description
         uses: tiangolo/uvicorn-gunicorn-fastapi@python3.7
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_REPOSITORY: tiangolo/uvicorn-gunicorn-fastapi
-
-      - name: Checkout
-        uses: actions/checkout@master
 
       # Add steps here like linting, testing, minification, etc.
 
