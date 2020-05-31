@@ -21,10 +21,18 @@ env:
   CONTAINER_IMAGE: fastapi-example:${{ github.sha }}
 
 jobs:
-  build-and-push:
+  dockerHubDescription:
     name: Build and deploy
-    runs-on: tiangolo/uvicorn-gunicorn-fastapi:python3.7
+    runs-on: ubuntu-latest
     steps:
+
+      - uses: actions/checkout@v2
+      - name: Docker Hub Description
+        uses: tiangolo/uvicorn-gunicorn-fastapi@python3.7
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_REPOSITORY: tiangolo/uvicorn-gunicorn-fastapi
 
     - name: Checkout
       uses: actions/checkout@master
