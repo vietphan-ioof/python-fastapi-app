@@ -34,27 +34,27 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_REPOSITORY: tiangolo/uvicorn-gunicorn-fastapi
 
-    - name: Checkout
-      uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@master
 
-    # Add steps here like linting, testing, minification, etc.
+      # Add steps here like linting, testing, minification, etc.
 
-    - name: Setup ECR
-      run: |
-        # Login to AWS ECR
-        $( aws ecr get-login --no-include-email )
-    - name: Build and tag the image
-      run: |
-        # Build and tag the image
-        docker build \
-          -t $CONTAINER_IMAGE \
-          -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE ./app
+      - name: Setup ECR
+        run: |
+          # Login to AWS ECR
+          $( aws ecr get-login --no-include-email )
+      - name: Build and tag the image
+        run: |
+          # Build and tag the image
+          docker build \
+            -t $CONTAINER_IMAGE \
+            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE ./app
 
-    # Add additional steps here like scanning of image
+      # Add additional steps here like scanning of image
 
-    # Only push to registry on master
-    - name: Push
-      if: github.ref == 'refs/heads/master'
-      run: |
-        # Push image to AWS ECR
-        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE
+      # Only push to registry on master
+      - name: Push
+        if: github.ref == 'refs/heads/master'
+        run: |
+          # Push image to AWS ECR
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE
