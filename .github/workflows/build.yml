@@ -2,12 +2,12 @@
 on:
   pull_request:
     paths:
-    - app/**
+      - app/**
   push:
     paths:
-    - app/**
+      - app/**
     branches:         # array of glob patterns matching against refs/heads. Optional; defaults to all
-    - master          # triggers on pushes that contain changes in master
+      - master          # triggers on pushes that contain changes in master
 
 name: Build and Push to ECR
 
@@ -25,34 +25,35 @@ jobs:
     name: Build and deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.7"
+          
+      - name: Install Dependencies
+        run: python3.7 -m pip install fastapi
 
-    - name: Checkout
-      uses: actions/checkout@master
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: "3.7"
-    - name: Install Dependencies
-      run: python3.7 -m pip install fastapi
+      # Add steps here like linting, testing, minification, etc.
+      - name: Setup ECR
+        run: |
+          # Login to AWS ECR
+          $(aws ecr get-login --no-include-email)
+          
+      - name: Build and tag the image
+        run: |
+          # Build and tag the image
+          docker build \
+            -t $CONTAINER_IMAGE \
+            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE ./app
 
-    # Add steps here like linting, testing, minification, etc.
+      # Add additional steps here like scanning of image
 
-    - name: Setup ECR
-      run: |
-        # Login to AWS ECR
-        $( aws ecr get-login --no-include-email )
-    - name: Build and tag the image
-      run: |
-        # Build and tag the image
-        docker build \
-          -t $CONTAINER_IMAGE \
-          -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE ./app
-
-    # Add additional steps here like scanning of image
-
-    # Only push to registry on master
-    - name: Push
-      if: github.ref == 'refs/heads/master'
-      run: |
-        # Push image to AWS ECR
-        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE
+      # Only push to registry on master
+      - name: Push
+        if: github.ref == 'refs/heads/master'
+        run: |
+          # Push image to AWS ECR
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE
